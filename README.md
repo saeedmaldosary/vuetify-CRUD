@@ -1,5 +1,14 @@
 # Vuetify CRUD
 
+## App Features ✨
+
+- CRUD Dashbaord you can add, edit, delete.
+- All payloads for requests and responses are JSON.
+- Different user roles when adding/modifying customer information to control their access to the application.
+- Pagination technique.
+- Responsive UI
+
+
 ## Project setup
 
 ```
