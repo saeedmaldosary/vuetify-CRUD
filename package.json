@@ -1,5 +1,5 @@
 {
-  "name": "tamara-portal",
+  "name": "portal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,9 +7,12 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "axios": "^0.26.0",
     "core-js": "^3.8.3",
+    "parse-link-header": "^2.0.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
+    "vuetify": "^2.4.0",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
@@ -19,6 +22,8 @@
     "@vue/cli-service": "~5.0.0",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
-    "vue-template-compiler": "^2.6.14"
+    "vue-cli-plugin-vuetify": "~2.4.5",
+    "vue-template-compiler": "^2.6.14",
+    "vuetify-loader": "^1.7.0"
   }
 }

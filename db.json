@@ -1,0 +1,75 @@
+{
+  "customers": [
+    {
+      "email": "customer1@exmaple.co",
+      "first_name": "Mona",
+      "last_name": "Lisa",
+      "phone_number": "966501234567",
+      "gender": "MALE",
+      "birth_date": "2002-03-29",
+      "country_code": "SA",
+      "address": {
+        "street": "3764 Al Urubah Rd",
+        "city": "Riyadh",
+        "postal_code": "87612"
+      },
+      "is_email_verified": false,
+      "is_id_verified": true,
+      "national_id": "123456789",
+      "status": "ACTIVE",
+      "id": "O2dK9Ui"
+    },
+    {
+      "email": "customer2@exmaple.co",
+      "first_name": "Mohammed",
+      "last_name": "Ali",
+      "phone_number": "(258) 673-1223",
+      "gender": "MALE",
+      "birth_date": "2000-05-11",
+      "country_code": "US",
+      "address": {
+        "street": "4587 Hendrerit Av",
+        "city": "New York",
+        "postal_code": "09846"
+      },
+      "is_email_verified": true,
+      "is_id_verified": true,
+      "national_id": "98763456791",
+      "status": "ACTIVE",
+      "id": "mHKX5ym"
+    },
+    {
+      "email": "customer3@exmaple.co",
+      "first_name": "John",
+      "last_name": "Ahmed",
+      "phone_number": "(258) 673-12231",
+      "gender": "FEMALE",
+      "birth_date": "1996-03-13",
+      "country_code": "US",
+      "address": {
+        "street": "110 Montes, Rd",
+        "city": "Los Angeles",
+        "postal_code": "98614"
+      },
+      "is_email_verified": false,
+      "is_id_verified": true,
+      "national_id": "98223345679",
+      "status": "INACTIVE",
+      "id": "ZrE0rem"
+    }
+  ],
+  "Users": [
+    {
+      "email": "admin@portal.com",
+      "password": "123456",
+      "role": "Admin",
+      "id": "1"
+    },
+    {
+      "email": "viewer@portal.com",
+      "password": "123456",
+      "role": "Viewer",
+      "id": "2"
+    }
+  ]
+}
