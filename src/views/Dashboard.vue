@@ -309,7 +309,6 @@ export default {
       dialogAddressDetails: false,
       page: 1,
       pageCount: 0,
-      totalRecords: 0,
       itemsPerPage: 2,
       verified: [true, false],
       genders: ["MALE", "FEMALE"],
@@ -584,17 +583,6 @@ export default {
         await this.addCustomer();
       }
       this.close();
-    },
-
-    getNumberOfPagesShown() {
-      var string = (this.page - 1) * this.itemsPerPage + 1 + "-";
-      if (this.page * this.itemsPerPage <= this.totalRecords) {
-        string = string + this.page * this.itemsPerPage;
-      } else {
-        string = string + this.totalRecords;
-      }
-
-      return string;
     },
   },
 };
