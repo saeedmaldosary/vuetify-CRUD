@@ -1,10 +1,10 @@
 <template>
-  <v-app style="background-color: #f5f5f5" id="inspire">
+  <v-app style="background-color: #f5f5f5">
     <v-main>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4>
-            <v-card class="elevation-12">
+            <v-card>
               <v-toolbar dark color="primary">
                 <v-toolbar-title>Login</v-toolbar-title>
               </v-toolbar>
@@ -40,7 +40,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn :loading="loading" @click="login" color="primary"
+                <v-btn :loading="loading" class="mb-3 mr-2" @click="login" color="primary"
                   >Sign in</v-btn
                 >
               </v-card-actions>

@@ -10,32 +10,56 @@
       <v-divider></v-divider>
 
       <v-list dense nav>
-        <v-list-item v-for="item in items" :key="item.title" :to="item.to" link>
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="logout">
-          <v-list-item-icon>
-            <v-icon>mdi-logout</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>Logout</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <template>
+          <div v-for="item in items" :key="item.title">
+            <v-list-group
+              v-if="item.items"
+              v-model="item.active"
+              :group="'dashboard'"
+              :prepend-icon="item.icon"
+              no-action
+              link
+            >
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title v-text="item.title"></v-list-item-title>
+                </v-list-item-content>
+              </template>
+              <v-list-item
+                v-for="subItem in item.items"
+                :key="subItem.title"
+                :to="subItem.to"
+              >
+                <v-list-item-icon>
+                  <v-icon v-text="subItem.icon"></v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title v-text="subItem.title"></v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-group>
+            <v-list-item v-else :to="item.to" link>
+              <v-list-item-icon>
+                <v-icon v-text="item.icon"></v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.title"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </div>
+        </template>
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+    <v-app-bar app color="primary">
+      <v-app-bar-nav-icon dark @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-spacer></v-spacer>
+      <v-btn dark @click="logout" icon>
+        <v-icon dark>mdi-export</v-icon>
+      </v-btn>
     </v-app-bar>
 
-    <v-main>
+    <v-main style="background-color: #f5f5f5">
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -46,7 +70,18 @@ export default {
   data: () => ({
     drawer: null,
     items: [
-      { title: "Dashboard", icon: "mdi-view-dashboard", to: "/dashboard" },
+      {
+        title: "Dashboard",
+        icon: "mdi-view-dashboard",
+        to: "/dashboard",
+        items: [
+          {
+            title: "Customers",
+            icon: "mdi-account-group",
+            to: "/dashboard/customers",
+          },
+        ],
+      },
       { title: "About", icon: "mdi-help-box", to: "/about" },
     ],
     right: null,
