@@ -12,6 +12,53 @@
       </v-alert>
     </div>
 
+    <v-row align="center" class="mb-5">
+      <v-col cols="12" sm="6">
+        <v-card elevation="2">
+          <v-chip label outlined class="ma-5">
+            <v-icon left> mdi-filter-outline </v-icon>Filters</v-chip
+          >
+          <v-row align="center" class="mx-2">
+            <v-col cols="12" sm="6">
+              <v-text-field
+                label="Customer ID"
+                v-model="customerID"
+                dense
+                filled
+              ></v-text-field>
+            </v-col>
+
+            <v-col class="d-flex" cols="12" sm="6">
+              <v-select
+                :disabled="customerID ? true : false"
+                :items="genders"
+                v-model="customerID ? (gender = '') : gender"
+                filled
+                dense
+                label="Gender"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <div style="display: flex; justify-content: flex-end">
+            <v-btn
+              class="mr-5 mb-5"
+              @click="reset"
+              dark
+              style="background-color: #5cbbf6"
+              >Reset</v-btn
+            >
+            <v-btn
+              class="mr-5 mb-5"
+              :loading="loading"
+              @click="getCustomers"
+              color="primary"
+              >Search</v-btn
+            >
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <v-data-table
       :headers="headers"
       :items="customers"
@@ -292,7 +339,7 @@
           class="mx-5"
           v-model="itemsPerPage"
           @change="getCustomers"
-          style="min-width: 130px; max-width:130px"
+          style="min-width: 140px; max-width: 140px"
           :items="itemsPerPageList"
           label="Items per page"
         ></v-select>
@@ -328,6 +375,8 @@ export default {
       pageCount: 0,
       itemsPerPage: 2,
       itemsPerPageList: [10, 20],
+      customerID: "",
+      gender: "",
       verified: [true, false],
       genders: ["MALE", "FEMALE"],
       status: ["ACTIVE", "INACTIVE"],
@@ -765,9 +814,39 @@ export default {
     async getCustomers() {
       this.loading = true;
       try {
-        const res = await axios.get(
-          this.baseUrl + "?_page=" + this.page + "&_limit=" + this.itemsPerPage
-        );
+        if (this.customerID == "") {
+          if (this.gender == "") {
+            var res = await axios.get(
+              this.baseUrl +
+                "?_page=" +
+                this.page +
+                "&_limit=" +
+                this.itemsPerPage
+            );
+          } else {
+            this.page = 1;
+            var res = await axios.get(
+              this.baseUrl +
+                "?_page=" +
+                this.page +
+                "&_limit=" +
+                this.itemsPerPage +
+                "&gender=" +
+                this.gender
+            );
+          }
+        } else {
+          this.page = 1;
+          var res = await axios.get(
+            this.baseUrl +
+              "?_page=" +
+              this.page +
+              "&_limit=" +
+              this.itemsPerPage +
+              "&id=" +
+              this.customerID
+          );
+        }
         var headerLink = res.headers.link;
 
         var lastRelIndex = headerLink.lastIndexOf(",");
@@ -788,7 +867,6 @@ export default {
 
         this.loading = false;
       } catch (e) {
-        console.log(e);
         this.loading = false;
         this.throwErrorMsg("Error happen when getting the customers.");
       }
@@ -854,6 +932,12 @@ export default {
         await this.addCustomer();
       }
       this.close();
+    },
+
+    reset() {
+      this.customerID = "";
+      this.gender = "";
+      this.getCustomers();
     },
   },
 };
