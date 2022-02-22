@@ -289,10 +289,10 @@
       </template>
       <template v-slot:body.append>
         <v-select
-          class="mt-3 mx-5"
+          class="mx-5"
           v-model="itemsPerPage"
           @change="getCustomers"
-          style="min-width: 150px"
+          style="min-width: 130px; max-width:130px"
           :items="itemsPerPageList"
           label="Items per page"
         ></v-select>

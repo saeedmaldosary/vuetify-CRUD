@@ -1,9 +1,16 @@
 <template>
   <v-app id="inspire">
     <v-navigation-drawer v-model="drawer" app>
-      <v-list-item>
+      <v-list-item two-line>
+        <v-list-item-avatar>
+          <v-badge avatar bordered>
+            <v-avatar size="40"  rounded>
+              <v-img :src="require('@/assets/logo.png')"></v-img>
+            </v-avatar>
+          </v-badge>
+        </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title class="text-h6">Portal</v-list-item-title>
+          <v-list-item-title class="text-h4 font-weight-bold">Portal</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
@@ -16,6 +23,7 @@
               v-if="item.items"
               v-model="item.active"
               :group="'dashboard'"
+              class="ml-1"
               :prepend-icon="item.icon"
               no-action
               link
@@ -38,7 +46,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list-group>
-            <v-list-item v-else :to="item.to" link>
+            <v-list-item class="ml-1" v-else :to="item.to" link>
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
               </v-list-item-icon>
