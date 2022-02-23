@@ -2,7 +2,7 @@
 
 ## App Features ✨
 
-- CRUD Dashbaord (add, edit, delete).
+- CRUD Dashbaord (read, add, edit, delete).
 - All payloads for requests and responses are JSON.
 - Different user roles when adding/modifying customer information to control their access to the application.
 - Pagination technique.
