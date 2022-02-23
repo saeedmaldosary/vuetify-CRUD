@@ -930,6 +930,12 @@ export default {
         await this.editCustomer();
       } else {
         await this.addCustomer();
+        this.defaultItem.address.street = "";
+        this.defaultItem.address.city = "";
+        this.defaultItem.address.postal_code = "";
+        this.editedItem.address.street = "";
+        this.editedItem.address.city = "";
+        this.editedItem.address.postal_code = "";
       }
       this.close();
     },
