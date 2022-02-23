@@ -5,10 +5,23 @@
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4>
             <v-card>
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>Login</v-toolbar-title>
+              <v-toolbar dark color="primary" style="box-shadow: none">
+                <v-list-item style="padding: 0px">
+                  <v-list-item-avatar>
+                    <v-badge avatar bordered>
+                      <v-avatar size="40" rounded>
+                        <v-img :src="require('@/assets/logoWhite.png')"></v-img>
+                      </v-avatar>
+                    </v-badge>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-h4 font-weight-bold"
+                      >Portal</v-list-item-title
+                    >
+                  </v-list-item-content>
+                </v-list-item>
               </v-toolbar>
-              <v-card-text>
+              <v-card-text style="padding: 16px 16px 0px 16px">
                 <v-form>
                   <div v-if="errorMsg">
                     <v-alert text type="error" color="#d32f2f">
@@ -40,8 +53,12 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn :loading="loading" class="mb-3 mr-2" @click="login" color="primary"
-                  >Sign in</v-btn
+                <v-btn
+                  :loading="loading"
+                  class="mb-3 mr-2"
+                  @click="login"
+                  color="primary"
+                  >Login</v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -87,11 +104,11 @@ export default {
           localStorage.setItem("user-info", JSON.stringify(result.data));
           this.$router.push({ name: "Portal" });
         } else {
-          this.throwErrorMsg("login info wrong!");
+          this.throwErrorMsg("Incorrect email or password.");
         }
         this.loading = false;
       } catch (e) {
-        this.throwErrorMsg("error durning login");
+        this.throwErrorMsg("Something went wrong. Please try again later.");
         this.loading = false;
       }
     },
@@ -99,4 +116,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.v-toolbar__content {
+  padding: 4px 10px 4px 10px !important;
+}
+</style>
