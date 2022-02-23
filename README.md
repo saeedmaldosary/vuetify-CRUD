@@ -6,6 +6,7 @@
 - All payloads for requests and responses are JSON.
 - Different user roles when adding/modifying customer information to control their access to the application.
 - Pagination technique.
+- Filters and search.
 - Responsive UI.
 
 
