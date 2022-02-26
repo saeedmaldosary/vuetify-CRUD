@@ -1,6 +1,6 @@
 <template>
   <div class="home pa-6">
-    <div v-if="errorMsg">
+    <div id="errorMsg" v-if="errorMsg">
       <v-alert text type="error" color="#d32f2f">
         {{ errorMsg }}
       </v-alert>

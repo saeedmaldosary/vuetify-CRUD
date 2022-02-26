@@ -23,7 +23,7 @@
               </v-toolbar>
               <v-card-text style="padding: 16px 16px 0px 16px">
                 <v-form>
-                  <div v-if="errorMsg">
+                  <div id="errorMsg" v-if="errorMsg">
                     <v-alert text type="error" color="#d32f2f">
                       {{ errorMsg }}
                     </v-alert>
@@ -57,6 +57,7 @@
                   :loading="loading"
                   class="mb-3 mr-2"
                   @click="login"
+                  data-test="loginBtn"
                   color="primary"
                   >Login</v-btn
                 >
@@ -75,9 +76,6 @@ import utils from "@/mixins/utils.js";
 export default {
   mixins: [utils],
   name: "Login",
-  props: {
-    source: String,
-  },
   data() {
     return {
       email: "",
