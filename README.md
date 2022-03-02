@@ -8,6 +8,7 @@
 - Pagination technique.
 - Filters and search.
 - Export PDF.
+- Test unit.
 - Responsive UI.
 
 
