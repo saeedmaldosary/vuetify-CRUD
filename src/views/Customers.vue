@@ -65,6 +65,7 @@
       :items="customers"
       class="elevation-1"
       :loading="loading"
+      id="customersTable"
       loading-text="loading Customers Data..."
       :page.sync="page"
       :items-per-page="itemsPerPage"
@@ -82,6 +83,7 @@
                 :disabled="userRole == 'Viewer'"
                 color="primary"
                 v-bind="attrs"
+                id="newCustomerBtn"
                 :loading="loading"
                 v-on="on"
               >
@@ -337,14 +339,28 @@
         >
       </template>
       <template v-slot:body.append>
-        <v-select
-          class="mx-5"
-          v-model="itemsPerPage"
-          @change="getCustomers"
-          style="min-width: 140px; max-width: 140px"
-          :items="itemsPerPageList"
-          label="Items per page"
-        ></v-select>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <v-select
+            class="ml-5 mt-3"
+            v-model="itemsPerPage"
+            @change="getCustomers"
+            style="min-width: 140px; max-width: 140px"
+            :items="itemsPerPageList"
+            label="Items per page"
+          ></v-select>
+          <v-btn
+            class="ma-5"
+            style="background-color: #5cbbf6"
+            dark
+            @click="generatePDF"
+            >Export PDF</v-btn
+          >
+        </div>
       </template>
     </v-data-table>
     <div class="text-center pt-2">
@@ -355,6 +371,8 @@
 
 <script>
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import utils from "@/mixins/utils.js";
 
 export default {
@@ -493,6 +511,40 @@ export default {
     this.getCountries();
   },
   methods: {
+    generatePDF() {
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0");
+      var yyyy = today.getFullYear();
+
+      today = yyyy + mm + dd;
+
+      const columns = [
+        { title: "ID", dataKey: "id" },
+        { title: "Email", dataKey: "email" },
+        { title: "Name", dataKey: "first_name" },
+        { title: "Gender", dataKey: "gender" },
+        { title: "Birth Date", dataKey: "birth_date" },
+        { title: "Country Code", dataKey: "country_code" },
+      ];
+
+      var doc = new jsPDF({
+        orientation: "portrait",
+        unit: "in",
+        format: "letter",
+      });
+      doc
+        .setFontSize(16)
+        .text("Customers Details " + yyyy + "-" + mm + "-" + dd, 0.5, 1.0);
+      doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
+      doc.autoTable({
+        columns,
+        body: this.customers,
+        margin: { left: 0.5, top: 1.25 },
+      });
+
+      doc.save(`${"CustomersDetails_" + today}.pdf`);
+    },
     async addCustomer() {
       this.saveLoading = true;
       try {
@@ -718,3 +770,5 @@ export default {
   },
 };
 </script>
+
+<style></style>
