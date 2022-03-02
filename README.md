@@ -7,6 +7,7 @@
 - Different user roles when adding/modifying customer information to control their access to the application.
 - Pagination technique.
 - Filters and search.
+- Export PDF.
 - Responsive UI.
 
 
