@@ -538,7 +538,51 @@ export default {
         today = yyyy + mm + dd;
 
         if (typeof XLSX == "undefined") XLSX = require("xlsx");
-        const data = XLSX.utils.json_to_sheet(this.customers);
+
+        let cities = this.customers.map((a) => a.address.city);
+        let streets = this.customers.map((a) => a.address.street);
+        let postalCodes = this.customers.map((a) => a.address.postal_code);
+
+        for (var i = 0; i < this.customers.length; i++) {
+          this.customers[i].city = cities[i];
+          this.customers[i].street = streets[i];
+          this.customers[i].postal_code = postalCodes[i];
+        }
+
+        this.customers.forEach(function (v) {
+          delete v.address;
+        });
+
+        const sortOrder = {
+          id: 1,
+          email: 2,
+          first_name: 3,
+          last_name: 4,
+          phone_number: 5,
+          gender: 6,
+          birth_date: 7,
+          country_code: 8,
+          is_email_verified: 9,
+          is_id_verified: 10,
+          national_id: 11,
+          status: 12,
+          city: 13,
+          street: 14,
+          postal_code: 15,
+        };
+
+        const orderedCustomers = this.customers.map((o) =>
+          Object.assign(
+            {},
+            ...Object.keys(o)
+              .sort((a, b) => sortOrder[a] - sortOrder[b])
+              .map((x) => {
+                return { [x]: o[x] };
+              })
+          )
+        );
+
+        const data = XLSX.utils.json_to_sheet(orderedCustomers);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, data, "data");
         XLSX.writeFile(wb, `${"CustomersDetails_" + today}.xlsx`);
@@ -714,7 +758,6 @@ export default {
           this.pageCount = 1;
         }
         this.customers = res.data;
-        console.log(this.customers);
 
         this.loading = false;
       } catch (e) {
