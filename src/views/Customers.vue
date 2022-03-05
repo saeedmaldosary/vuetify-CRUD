@@ -43,14 +43,14 @@
             <v-btn
               class="mr-5 mb-5"
               @click="reset"
-              :loading="loading"
+              :disabled="loading"
               dark
               style="background-color: #5cbbf6"
               >Reset</v-btn
             >
             <v-btn
               class="mr-5 mb-5"
-              :loading="loading"
+              :disabled="loading"
               @click="getCustomers"
               color="primary"
               >Search</v-btn
@@ -82,6 +82,7 @@
               <v-btn
                 :disabled="userRole == 'Viewer'"
                 color="primary"
+                class="mr-2"
                 v-bind="attrs"
                 id="newCustomerBtn"
                 :loading="loading"
@@ -338,30 +339,43 @@
           >mdi-menu-open</v-icon
         >
       </template>
-      <template v-slot:body.append>
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-          "
-        >
+
+      <template v-slot:footer>
+        <div style="display: flex; justify-content: space-between">
           <v-select
-            class="ml-5 mt-3"
+            class="ml-4 mt-3"
             v-model="itemsPerPage"
             @change="getCustomers"
-            style="min-width: 140px; max-width: 140px"
+            style="min-width: 85px; max-width: 85px"
             :items="itemsPerPageList"
             label="Items per page"
-          ></v-select>
-          <v-btn
-            class="ma-5"
-            style="background-color: #5cbbf6"
-            dark
-            @click="generatePDF"
-            >Export PDF</v-btn
           >
+          </v-select>
+          <v-menu offset-y>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                style="background-color: #5cbbf6"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                class="ma-5"
+              >
+                Export
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="(item, type) in exportItems"
+                @click="exportExcel(item)"
+                :key="type"
+              >
+                <v-list-item-title>{{ item.type }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </div>
       </template>
+      -->
     </v-data-table>
     <div class="text-center pt-2">
       <v-pagination v-model="page" :length="pageCount"></v-pagination>
@@ -373,6 +387,7 @@
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import XLSX from "xlsx";
 import utils from "@/mixins/utils.js";
 
 export default {
@@ -461,6 +476,8 @@ export default {
         national_id: "",
         status: "",
       },
+      exportSelected: "",
+      exportItems: [{ type: "PDF" }, { type: "Excel" }],
       countries: [],
     };
   },
@@ -511,40 +528,64 @@ export default {
     this.getCountries();
   },
   methods: {
-    generatePDF() {
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, "0");
-      var mm = String(today.getMonth() + 1).padStart(2, "0");
-      var yyyy = today.getFullYear();
+    exportExcel(item) {
+      if (item.type == "Excel") {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0");
+        var yyyy = today.getFullYear();
 
-      today = yyyy + mm + dd;
+        today = yyyy + mm + dd;
 
-      const columns = [
-        { title: "ID", dataKey: "id" },
-        { title: "Email", dataKey: "email" },
-        { title: "Name", dataKey: "first_name" },
-        { title: "Gender", dataKey: "gender" },
-        { title: "Birth Date", dataKey: "birth_date" },
-        { title: "Country Code", dataKey: "country_code" },
-      ];
+        if (typeof XLSX == "undefined") XLSX = require("xlsx");
+        const data = XLSX.utils.json_to_sheet(this.customers);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, data, "data");
+        XLSX.writeFile(wb, `${"CustomersDetails_" + today}.xlsx`);
+      } else {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0");
+        var yyyy = today.getFullYear();
 
-      var doc = new jsPDF({
-        orientation: "portrait",
-        unit: "in",
-        format: "letter",
-      });
-      doc
-        .setFontSize(16)
-        .text("Customers Details " + yyyy + "-" + mm + "-" + dd, 0.5, 1.0);
-      doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
-      doc.autoTable({
-        columns,
-        body: this.customers,
-        margin: { left: 0.5, top: 1.25 },
-      });
+        today = yyyy + mm + dd;
 
-      doc.save(`${"CustomersDetails_" + today}.pdf`);
+        const columns = [
+          { title: "ID", dataKey: "id" },
+          { title: "Email", dataKey: "email" },
+          { title: "Name", dataKey: "first_name" },
+          { title: "Gender", dataKey: "gender" },
+          { title: "Birth Date", dataKey: "birth_date" },
+          { title: "Country Code", dataKey: "country_code" },
+        ];
+
+        var doc = new jsPDF();
+
+        var img = require("@/assets/logo.png");
+
+        doc.addImage(img, "png", 3, 3, 20, 20);
+        doc
+          .setTextColor("#0000")
+          .setFont(undefined, "bold")
+          .setFontSize(46)
+          .text("Portal", 24, 18);
+        doc.line(200, 28, 10, 28);
+        doc
+          .setTextColor("#007bff")
+          .setFont(undefined, "bold")
+          .setFontSize(16)
+          .text("Customers Details " + yyyy + "-" + mm + "-" + dd, 10, 37);
+        doc.autoTable({
+          columns,
+          body: this.customers,
+          margin: { left: 10, top: 45 },
+          headStyles: { fillColor: "#5cbbf6" },
+        });
+
+        doc.save(`${"CustomersDetails_" + today}.pdf`);
+      }
     },
+
     async addCustomer() {
       this.saveLoading = true;
       try {
@@ -672,8 +713,8 @@ export default {
         } else {
           this.pageCount = 1;
         }
-
         this.customers = res.data;
+        console.log(this.customers);
 
         this.loading = false;
       } catch (e) {
