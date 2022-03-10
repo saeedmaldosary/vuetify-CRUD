@@ -357,6 +357,7 @@
                 style="background-color: #5cbbf6"
                 dark
                 v-bind="attrs"
+                :loading="loadingExport"
                 v-on="on"
                 class="ma-5"
               >
@@ -366,7 +367,7 @@
             <v-list>
               <v-list-item
                 v-for="(item, type) in exportItems"
-                @click="exportExcel(item)"
+                @click="exportTable(item)"
                 :key="type"
               >
                 <v-list-item-title>{{ item.type }}</v-list-item-title>
@@ -403,6 +404,7 @@ export default {
       errorMsg: "",
       successMsg: "",
       loading: false,
+      loadingExport: false,
       saveLoading: false,
       dialogDelete: false,
       dialogAddressDetails: false,
@@ -528,65 +530,77 @@ export default {
     this.getCountries();
   },
   methods: {
-    exportExcel(item) {
+    async exportTable(item) {
       if (item.type == "Excel") {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, "0");
-        var mm = String(today.getMonth() + 1).padStart(2, "0");
-        var yyyy = today.getFullYear();
+        this.loadingExport = true;
+        try {
+          var res = await axios.get(this.baseUrl);
+          var allCustomers = res.data;
+          this.loadingExport = false
 
-        today = yyyy + mm + dd;
+          var today = new Date();
+          var dd = String(today.getDate()).padStart(2, "0");
+          var mm = String(today.getMonth() + 1).padStart(2, "0");
+          var yyyy = today.getFullYear();
 
-        if (typeof XLSX == "undefined") XLSX = require("xlsx");
+          today = yyyy + mm + dd;
 
-        let cities = this.customers.map((a) => a.address.city);
-        let streets = this.customers.map((a) => a.address.street);
-        let postalCodes = this.customers.map((a) => a.address.postal_code);
+          if (typeof XLSX == "undefined") XLSX = require("xlsx");
 
-        for (var i = 0; i < this.customers.length; i++) {
-          this.customers[i].city = cities[i];
-          this.customers[i].street = streets[i];
-          this.customers[i].postal_code = postalCodes[i];
+          let cities = allCustomers.map((a) => a.address.city);
+          let streets = allCustomers.map((a) => a.address.street);
+          let postalCodes = allCustomers.map((a) => a.address.postal_code);
+
+          for (var i = 0; i < allCustomers.length; i++) {
+            allCustomers[i].city = cities[i];
+            allCustomers[i].street = streets[i];
+            allCustomers[i].postal_code = postalCodes[i];
+          }
+
+          allCustomers.forEach(function (v) {
+            delete v.address;
+          });
+
+          const sortOrder = {
+            id: 1,
+            email: 2,
+            first_name: 3,
+            last_name: 4,
+            phone_number: 5,
+            gender: 6,
+            birth_date: 7,
+            country_code: 8,
+            is_email_verified: 9,
+            is_id_verified: 10,
+            national_id: 11,
+            status: 12,
+            city: 13,
+            street: 14,
+            postal_code: 15,
+          };
+
+          const orderedCustomers = allCustomers.map((o) =>
+            Object.assign(
+              {},
+              ...Object.keys(o)
+                .sort((a, b) => sortOrder[a] - sortOrder[b])
+                .map((x) => {
+                  return { [x]: o[x] };
+                })
+            )
+          );
+
+          const data = XLSX.utils.json_to_sheet(orderedCustomers);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, data, "data");
+          XLSX.writeFile(wb, `${"CustomersDetails_" + today}.xlsx`);
+        } catch (e) {
+          this.loadingExport = false;
+          this.throwErrorMsg("Something went wrong. Please try again later.");
         }
-
-        this.customers.forEach(function (v) {
-          delete v.address;
-        });
-
-        const sortOrder = {
-          id: 1,
-          email: 2,
-          first_name: 3,
-          last_name: 4,
-          phone_number: 5,
-          gender: 6,
-          birth_date: 7,
-          country_code: 8,
-          is_email_verified: 9,
-          is_id_verified: 10,
-          national_id: 11,
-          status: 12,
-          city: 13,
-          street: 14,
-          postal_code: 15,
-        };
-
-        const orderedCustomers = this.customers.map((o) =>
-          Object.assign(
-            {},
-            ...Object.keys(o)
-              .sort((a, b) => sortOrder[a] - sortOrder[b])
-              .map((x) => {
-                return { [x]: o[x] };
-              })
-          )
-        );
-
-        const data = XLSX.utils.json_to_sheet(orderedCustomers);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, data, "data");
-        XLSX.writeFile(wb, `${"CustomersDetails_" + today}.xlsx`);
-      } else {
+      }
+      //end of excel
+      else {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, "0");
         var mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -767,6 +781,7 @@ export default {
     },
 
     async getCountries() {
+      this.loading = true;
       try {
         var res = await axios.get("http://localhost:3000/countries");
 
