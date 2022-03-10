@@ -531,20 +531,30 @@ export default {
   },
   methods: {
     async exportTable(item) {
-      if (item.type == "Excel") {
-        this.loadingExport = true;
-        try {
-          var res = await axios.get(this.baseUrl);
-          var allCustomers = res.data;
-          this.loadingExport = false
+      this.loadingExport = true;
+      try {
+        var res = await axios.get(this.baseUrl);
+        var allCustomers = res.data;
 
-          var today = new Date();
-          var dd = String(today.getDate()).padStart(2, "0");
-          var mm = String(today.getMonth() + 1).padStart(2, "0");
-          var yyyy = today.getFullYear();
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0");
+        var yyyy = today.getFullYear();
 
-          today = yyyy + mm + dd;
+        var local = today.getTime();
+        var offset = today.getTimezoneOffset() * (60 * 1000);
+        var utc = new Date(local + offset);
+        var localTime = new Date(utc.getTime() + 30 * 60 * 60 * 1000);
+        var hours = String(localTime.getHours()).padStart(2, "0");
+        var minutes = String(localTime.getMinutes().toString()).padStart(
+          2,
+          "0"
+        );
+        var seconds = String(localTime.getSeconds()).padStart(2, "0");
+        var time = hours + minutes + seconds;
+        today = yyyy + mm + dd;
 
+        if (item.type == "Excel") {
           if (typeof XLSX == "undefined") XLSX = require("xlsx");
 
           let cities = allCustomers.map((a) => a.address.city);
@@ -593,54 +603,65 @@ export default {
           const data = XLSX.utils.json_to_sheet(orderedCustomers);
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, data, "data");
-          XLSX.writeFile(wb, `${"CustomersDetails_" + today}.xlsx`);
-        } catch (e) {
-          this.loadingExport = false;
-          this.throwErrorMsg("Something went wrong. Please try again later.");
+          XLSX.writeFile(
+            wb,
+            `${"CustomersDetails_" + today + "_" + time}.xlsx`
+          );
+        } else {
+          const columns = [
+            { title: "ID", dataKey: "id" },
+            { title: "Email", dataKey: "email" },
+            { title: "Name", dataKey: "first_name" },
+            { title: "Gender", dataKey: "gender" },
+            { title: "Birth Date", dataKey: "birth_date" },
+            { title: "Country Code", dataKey: "country_code" },
+          ];
+
+          var doc = new jsPDF();
+
+          var img = require("@/assets/logo.png");
+
+          doc.addImage(img, "png", 3, 3, 20, 20);
+          doc
+            .setTextColor("#0000")
+            .setFont(undefined, "bold")
+            .setFontSize(46)
+            .text("Portal", 24, 18);
+          doc.line(200, 28, 10, 28);
+          doc
+            .setTextColor("#007bff")
+            .setFont(undefined, "bold")
+            .setFontSize(16)
+            .text(
+              "Customers Details " +
+                yyyy +
+                "-" +
+                mm +
+                "-" +
+                dd +
+                " " +
+                hours +
+                ":" +
+                minutes +
+                ":" +
+                seconds,
+              10,
+              37
+            );
+          doc.autoTable({
+            columns,
+            body: allCustomers,
+            margin: { left: 10, top: 45 },
+            headStyles: { fillColor: "#5cbbf6" },
+          });
+
+          doc.save(`${"CustomersDetails_" + today + "_" + time}.pdf`);
         }
-      }
-      //end of excel
-      else {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, "0");
-        var mm = String(today.getMonth() + 1).padStart(2, "0");
-        var yyyy = today.getFullYear();
-
-        today = yyyy + mm + dd;
-
-        const columns = [
-          { title: "ID", dataKey: "id" },
-          { title: "Email", dataKey: "email" },
-          { title: "Name", dataKey: "first_name" },
-          { title: "Gender", dataKey: "gender" },
-          { title: "Birth Date", dataKey: "birth_date" },
-          { title: "Country Code", dataKey: "country_code" },
-        ];
-
-        var doc = new jsPDF();
-
-        var img = require("@/assets/logo.png");
-
-        doc.addImage(img, "png", 3, 3, 20, 20);
-        doc
-          .setTextColor("#0000")
-          .setFont(undefined, "bold")
-          .setFontSize(46)
-          .text("Portal", 24, 18);
-        doc.line(200, 28, 10, 28);
-        doc
-          .setTextColor("#007bff")
-          .setFont(undefined, "bold")
-          .setFontSize(16)
-          .text("Customers Details " + yyyy + "-" + mm + "-" + dd, 10, 37);
-        doc.autoTable({
-          columns,
-          body: this.customers,
-          margin: { left: 10, top: 45 },
-          headStyles: { fillColor: "#5cbbf6" },
-        });
-
-        doc.save(`${"CustomersDetails_" + today}.pdf`);
+        this.loadingExport = false;
+      } catch (e) {
+        console.log(e);
+        this.loadingExport = false;
+        this.throwErrorMsg("Something went wrong. Please try again later.");
       }
     },
 
