@@ -51,7 +51,7 @@
             <v-btn
               class="mr-5 mb-5"
               :disabled="loading"
-              @click="getCustomers"
+              @click="getCustomers('newSearch')"
               color="primary"
               >Search</v-btn
             >
@@ -345,7 +345,6 @@
           <v-select
             class="ml-4 mt-3"
             v-model="itemsPerPage"
-            @change="getCustomers"
             style="min-width: 85px; max-width: 85px"
             :items="itemsPerPageList"
             label="Items per page"
@@ -413,7 +412,9 @@ export default {
       itemsPerPage: 2,
       itemsPerPageList: [2, 5, 20],
       customerID: "",
+      customerIDSelected: "",
       gender: "",
+      genderSelected: "",
       verified: [true, false],
       genders: ["MALE", "FEMALE"],
       status: ["ACTIVE", "INACTIVE"],
@@ -496,12 +497,12 @@ export default {
 
   watch: {
     page: function changePage() {
-      this.getCustomers();
+      this.getCustomers("changePage");
     },
 
     itemsPerPage: function changeItemsPerPage() {
       this.page = 1;
-      this.getCustomers();
+      this.getCustomers("newSearch");
     },
 
     dialog(val) {
@@ -526,7 +527,7 @@ export default {
     }
     var userObj = JSON.parse(user);
     this.userRole = userObj[0].role;
-    this.getCustomers();
+    this.getCustomers("newSearch");
     this.getCountries();
   },
   methods: {
@@ -686,7 +687,7 @@ export default {
           national_id: this.editedItem.national_id,
           status: this.editedItem.status,
         });
-        await this.getCustomers();
+        await this.getCustomers("newSearch");
         this.throwSuccessMsg("Customer was successfully added.");
         this.saveLoading = false;
       } catch (e) {
@@ -717,7 +718,7 @@ export default {
           national_id: this.editedItem.national_id,
           status: this.editedItem.status,
         });
-        await this.getCustomers();
+        await this.getCustomers("newSearch");
         this.throwSuccessMsg("Customer was successfully edited.");
         this.saveLoading = false;
       } catch (e) {
@@ -732,7 +733,7 @@ export default {
       try {
         const res = await axios.delete(this.baseUrl + "/" + this.editedItem.id);
         this.page = 1;
-        await this.getCustomers();
+        await this.getCustomers("newSearch");
         this.throwSuccessMsg("Customer was successfully deleted.");
         this.saveLoading = false;
       } catch (e) {
@@ -742,11 +743,20 @@ export default {
       }
     },
 
-    async getCustomers() {
+    setData() {
+      this.genderSelected = this.gender;
+      this.customerIDSelected = this.customerID
+    },
+
+    async getCustomers(type) {
       this.loading = true;
+      if (type == "newSearch") {
+        this.setData();
+        this.page = 1
+      }
       try {
-        if (this.customerID == "") {
-          if (this.gender == "") {
+        if (this.customerIDSelected == "") {
+          if (this.genderSelected == "") {
             var res = await axios.get(
               this.baseUrl +
                 "?_page=" +
@@ -762,7 +772,7 @@ export default {
                 "&_limit=" +
                 this.itemsPerPage +
                 "&gender=" +
-                this.gender
+                this.genderSelected
             );
           }
         } else {
@@ -774,7 +784,7 @@ export default {
               "&_limit=" +
               this.itemsPerPage +
               "&id=" +
-              this.customerID
+              this.customerIDSelected
           );
         }
         var headerLink = res.headers.link;
@@ -885,7 +895,7 @@ export default {
     reset() {
       this.customerID = "";
       this.gender = "";
-      this.getCustomers();
+      this.getCustomers("newSearch");
     },
   },
 };
