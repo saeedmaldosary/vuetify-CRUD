@@ -624,8 +624,8 @@ export default {
 
           doc.addImage(img, "png", 3, 3, 20, 20);
           doc
-            .setTextColor("#0000")
-            .setFont(undefined, "bold")
+            .setTextColor("#000000")
+            .setFont("Helvetica", "bold")
             .setFontSize(46)
             .text("Portal", 24, 18);
           doc.line(200, 28, 10, 28);
@@ -745,14 +745,14 @@ export default {
 
     setData() {
       this.genderSelected = this.gender;
-      this.customerIDSelected = this.customerID
+      this.customerIDSelected = this.customerID;
     },
 
     async getCustomers(type) {
       this.loading = true;
       if (type == "newSearch") {
         this.setData();
-        this.page = 1
+        this.page = 1;
       }
       try {
         if (this.customerIDSelected == "") {
