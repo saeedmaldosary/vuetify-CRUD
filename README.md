@@ -20,6 +20,7 @@
 - Export XLSX & PDF.
 - Test unit.
 - Responsive UI.
+- Session extend.
 
 
 ## Project setup
