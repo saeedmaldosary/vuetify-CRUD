@@ -660,7 +660,6 @@ export default {
         }
         this.loadingExport = false;
       } catch (e) {
-        console.log(e);
         this.loadingExport = false;
         this.throwErrorMsg("Something went wrong. Please try again later.");
       }
@@ -691,7 +690,6 @@ export default {
         this.throwSuccessMsg("Customer was successfully added.");
         this.saveLoading = false;
       } catch (e) {
-        console.log(e);
         this.throwErrorMsg("Something went wrong. Please try again later.");
         this.saveLoading = false;
       }
@@ -722,7 +720,6 @@ export default {
         this.throwSuccessMsg("Customer was successfully edited.");
         this.saveLoading = false;
       } catch (e) {
-        console.log(e);
         this.throwErrorMsg("Something went wrong. Please try again later.");
         this.saveLoading = false;
       }
@@ -737,7 +734,6 @@ export default {
         this.throwSuccessMsg("Customer was successfully deleted.");
         this.saveLoading = false;
       } catch (e) {
-        console.log(e);
         this.throwErrorMsg("Something went wrong. Please try again later.");
         this.saveLoading = false;
       }

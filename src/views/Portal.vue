@@ -68,13 +68,18 @@
     </v-app-bar>
 
     <v-main style="background-color: #f5f5f5">
+       <SessionDialog />
       <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import SessionDialog from "@/views/SessionDialog.vue";
 export default {
+   components: {
+    SessionDialog
+  },
   data: () => ({
     drawer: null,
     items: [

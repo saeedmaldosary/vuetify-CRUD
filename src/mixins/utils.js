@@ -1,7 +1,6 @@
 export default {
   methods: {
     throwErrorMsg(msg) {
-      console.log(msg);
       this.errorMsg = msg;
       var self = this;
       setTimeout(function () {
