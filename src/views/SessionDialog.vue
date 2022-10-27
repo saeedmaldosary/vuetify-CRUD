@@ -4,7 +4,10 @@
       <div class="cardMain">
         <h3 class="mb-2">Session Expire Warning</h3>
         <div>
-          <p>Your session will expire in 2 minutes. Do you want to extend?</p>
+          <p style="margin-bottom: 0">
+            Your session will expire in {{ this.logoutTime }} seconds.
+          </p>
+          <p style="margin: 0px 0px 20px 0px; padding-top: 0">Do you want to extend?</p>
         </div>
       </div>
       <v-card-actions style="padding: 0">
@@ -32,13 +35,25 @@ export default {
   data() {
     return {
       dialog: false,
+      warningTime: 120,
       warningTimer: null,
+      logoutTime: 240,
       logoutTimer: null,
     };
   },
   watch: {
     $route() {
       this.resetTimer("reset");
+    },
+    logoutTime: {
+      handler(value) {
+        if (value > 0) {
+          setTimeout(() => {
+            this.logoutTime--;
+          }, 1000);
+        }
+      },
+      immediate: true,
     },
   },
   mounted() {
@@ -56,8 +71,8 @@ export default {
       this.$router.push({ name: "login" });
     },
     setTimer() {
-      this.warningTimer = setTimeout(this.showDialog, 2 * 60 * 1000);
-      this.logoutTimer = setTimeout(this.autoLogout, 4 * 60 * 1000);
+      this.warningTimer = setTimeout(this.showDialog, this.warningTime * 1000);
+      this.logoutTimer = setTimeout(this.autoLogout, this.logoutTime * 1000);
       this.dialog = false;
     },
     resetTimer(type) {
