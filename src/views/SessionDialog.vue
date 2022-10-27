@@ -5,9 +5,11 @@
         <h3 class="mb-2">Session Expire Warning</h3>
         <div>
           <p style="margin-bottom: 0">
-            Your session will expire in {{ this.logoutTime }} seconds.
+            Your session will expire in {{ this.leftTime }} seconds.
           </p>
-          <p style="margin: 0px 0px 20px 0px; padding-top: 0">Do you want to extend?</p>
+          <p style="margin: 0px 0px 20px 0px; padding-top: 0">
+            Do you want to extend?
+          </p>
         </div>
       </div>
       <v-card-actions style="padding: 0">
@@ -39,17 +41,19 @@ export default {
       warningTimer: null,
       logoutTime: 240,
       logoutTimer: null,
+      leftTime: 0,
+      leftTimer: null,
     };
   },
   watch: {
     $route() {
       this.resetTimer("reset");
     },
-    logoutTime: {
+    leftTime: {
       handler(value) {
         if (value > 0) {
-          setTimeout(() => {
-            this.logoutTime--;
+          this.leftTimer = setTimeout(() => {
+            this.leftTime--;
           }, 1000);
         }
       },
@@ -71,11 +75,13 @@ export default {
       this.$router.push({ name: "login" });
     },
     setTimer() {
+      this.leftTime = this.logoutTime;
       this.warningTimer = setTimeout(this.showDialog, this.warningTime * 1000);
       this.logoutTimer = setTimeout(this.autoLogout, this.logoutTime * 1000);
       this.dialog = false;
     },
     resetTimer(type) {
+      clearTimeout(this.leftTimer);
       clearTimeout(this.warningTimer);
       clearTimeout(this.logoutTimer);
       if (type === "reset") {
